@@ -168,6 +168,8 @@ def create_mode_df(fname, AMO_cutoff_freq):
 
     enso_ts = ds['nino34'][:]
 
+    cllj_ts = ds['cllj_timeseries_mon'][:]
+
     # Create version of PDO that is orthogonal to ENSO using Gram-Schmidt method
     pdo_orth = pdo_ts - np.dot(pdo_ts, enso_ts)/np.dot(enso_ts, enso_ts)*enso_ts
 
@@ -177,9 +179,9 @@ def create_mode_df(fname, AMO_cutoff_freq):
     else:  # no filter
         amo_lowpass = amo_ts
 
-    df = pd.DataFrame(columns=['year', 'month', 'season', 'AMO', 'AMO_lowpass', 'PDO', 'ENSO', 'PDO_orth'])
+    df = pd.DataFrame(columns=['year', 'month', 'season', 'AMO', 'AMO_lowpass', 'PDO', 'ENSO', 'PDO_orth','CLLJ'])
     df = df.assign(year=year, month=month, season=season_names,
-                   AMO=amo_ts, AMO_lowpass=amo_lowpass, PDO=pdo_ts, ENSO=enso_ts, PDO_orth=pdo_orth)
+                   AMO=amo_ts, AMO_lowpass=amo_lowpass, PDO=pdo_ts, ENSO=enso_ts, PDO_orth=pdo_orth, CLLJ = cllj_ts)
 
     return df
 
