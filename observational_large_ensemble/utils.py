@@ -328,7 +328,7 @@ def iaaft(x, fit_seasonal=False):
     x : numpy array
         Original time series
     fit_seasonal : bool
-        Should the monthly amplitudes be matched? Use True for ENSO.
+        Should the monthly amplitudes be matched? Use True for ENSO and CLLJ.
 
     Returns
     -------
