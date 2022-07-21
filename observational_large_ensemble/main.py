@@ -152,12 +152,12 @@ if __name__ == '__main__':
 
     # Create and save surrogate modes
     this_seed = 456
-    ENSO_surr, PDO_orth_surr, AMO_surr, mode_months = mc.create_surrogate_modes(cvdp_file, AMO_cutoff_freq,
+    ENSO_surr, PDO_orth_surr, AMO_surr, CLLJ_surr, mode_months = mc.create_surrogate_modes(cvdp_file, AMO_cutoff_freq,
                                                                                 this_seed, n_members, valid_years,
                                                                                 workdir)
 
     # Put it all together, and save to netcdf files
     print('putting it all together')
     mc.combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
-                           AMO_surr, ENSO_surr, PDO_orth_surr, mode_months, valid_years,
+                           AMO_surr, ENSO_surr, PDO_orth_surr, CLLJ_surr, mode_months, valid_years,
                            mode_lag, long_varnames, data_names, pr_transform, predictors_names)
