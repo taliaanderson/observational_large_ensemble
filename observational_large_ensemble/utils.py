@@ -571,9 +571,9 @@ def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds
     valid_years : numpy.ndarray
         Set of years to pull from file
     latbounds : numpy.ndarry
-    	Set of lats to pull from file
+    	Upper and lower lat bounds to pull from file
     lonbounds : numpy.ndarry
-    	Set of lons to pull from file
+    	Upper and lower lon bounds to pull from file
     mode_lag : int
         Number of months to lag the climate variable response from the mode time series
     cvdp_file : str
@@ -718,8 +718,8 @@ def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds
     X_month = X_month[subset]
 
     #Subset lats & lons
-    subLat = np.isin(lat, latbounds)
-    subLon = np.isin(lon, lonbounds)
+    subLat = np.where((lat >= latbounds[0]) & (lat <= latbounds[1]))
+	subLon = np.where((lon >= lonbounds[0]) & (lon <= lonbounds[1]))
     X = X[:, subLat, subLon]
     X_lat = lat[subLat]
     X_lon = lon[subLon]

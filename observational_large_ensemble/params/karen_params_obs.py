@@ -2,8 +2,10 @@
 
 import numpy as np
 
-version_name = 'noF'
+version_name = 'noF_CLLJ_CentAm_Pr'
 valid_years = np.arange(1921, 2019)  # for obs
+latbounds = [6 28] # for obs (covers Caribbean and Central America)
+lonbounds = [-100 -60] # for obs
 cvdp_loc = '/glade/work/mckinnon/CVDP/1920-2018'
 AMO_cutoff_freq = 1/20  # Cut off frequency for Butterworth filter of AMO (1/years)
 mode_lag = 0  # number of months to lag between mode time series and climate response
@@ -14,4 +16,4 @@ pr_dir = '/glade/work/mckinnon/GPCC'
 slp_dir = '/glade/work/mckinnon/20CRv2c'
 pr_transform = 'boxcox'  # can be boxcox or log
 varnames = ['pr']
-predictors_names = ['constant', 'ENSO', 'PDO_orth', 'AMO_lowpass']
+predictors_names = ['constant', 'ENSO', 'PDO_orth', 'AMO_lowpass', 'CLLJ']
