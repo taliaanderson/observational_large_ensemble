@@ -28,7 +28,7 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
     """
 
     # Fit OLS model to variable X (deterministic)
-    # Predictors: constant, GM-EM (forced component), ENSO, PDO, AMO
+    # Predictors: constant, GM-EM (forced component), ENSO, PDO, AMO, CLLJ
     # Model fit is monthly dependent cognizant of the seasonal cycle in teleconnections
 
     # Add constant
@@ -38,6 +38,7 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
     df['ENSO'] /= np.std(df['ENSO'])
     df['PDO_orth'] /= np.std(df['PDO_orth'])
     df['AMO_lowpass'] /= np.std(df['AMO_lowpass'])
+    df['CLLJ'] /= np.std(df['CLLJ'])
 
     attrs = da.attrs
     attrs['description'] = 'Residuals after removing constant, trend, and regression patterns from ENSO, PDO, AMO.'
@@ -119,7 +120,7 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
 
 
 def combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
-                        AMO_surr, ENSO_surr, PDO_orth_surr, mode_months, valid_years,
+                        AMO_surr, ENSO_surr, PDO_orth_surr, CLLJ_surr, mode_months, valid_years,
                         mode_lag, long_varnames, data_names, pr_transform, predictors_names):
 
     for this_varname in varnames:
@@ -161,12 +162,14 @@ def combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
             AMO_ts = AMO_surr[:, kk]
             ENSO_ts = ENSO_surr[:, kk]
             PDO_orth_ts = PDO_orth_surr[:, kk]
+            CLLJ_ts = CLLJ_surr[:, kk]
 
             # combine into dataframe, setting all to unity std
             mode_df = pd.DataFrame({'month': mode_months,
                                     'AMO_lowpass': AMO_ts/np.std(AMO_ts),
                                     'ENSO': ENSO_ts/np.std(ENSO_ts),
-                                    'PDO_orth': PDO_orth_ts/np.std(PDO_orth_ts)})
+                                    'PDO_orth': PDO_orth_ts/np.std(PDO_orth_ts),
+                                    'CLLJ': CLLJ_ts/np.std(CLLJ_ts)})
 
             # Use the indices for one month before the climate response
             df_shifted = olens_utils.shift_df(mode_df, mode_lag, ['month'])
@@ -242,6 +245,12 @@ def combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
                                df_shifted['AMO_lowpass'][:, np.newaxis, np.newaxis])
                 data += AMO_lowpass
 
+             if 'CLLJ' in predictors_names:
+
+                CLLJ = (ds_beta.beta_CLLJ[modes_idx, ...].values *
+                        df_shifted['CLLJ'][:, np.newaxis, np.newaxis])
+                data += CLLJ
+
             new_values = climate_noise.copy(data=data)
             if this_varname == 'pr':
                 # model was fit on transformed precip, so translate back to original units
@@ -286,6 +295,8 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
         Array (ntime x n_ens_members) of surrogate orthogonalized PDO time series
     amo_surr : numpy.ndarray
         Array (ntime x n_ens_members) of surrogate low-passed AMO time series
+    cllj_surr : numpy.ndarray
+        Array (ntime x n_ens_members) of surrogate CLLJ time series
     months : numpy.ndarray
         Months associated with the surrogate time series. Important when fit_seasonal=True
     """
@@ -296,6 +307,7 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
         enso_surr = ds_surr['ENSO_surr'].values
         pdo_surr = ds_surr['PDO_surr'].values
         amo_surr = ds_surr['AMO_surr'].values
+        cllj_surr = ds_surr['CLLJ_surr'].values
         months = ds_surr['month'].values
     else:
         # Load original versions
@@ -311,6 +323,7 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
         enso_surr = np.empty((ntime, n_ens_members))
         pdo_surr = np.empty_like(enso_surr)
         amo_surr = np.empty_like(pdo_surr)
+        cllj_surr = np.empty_like(amo_surr)
 
         for kk in range(n_ens_members):
             # ENSO (accounting for seasonality of variance)
@@ -337,14 +350,21 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
                 amo_lowpass = tmp[0]
             amo_surr[:, kk] = amo_lowpass
 
+            # CLLJ (accounting for seasonality of variance)
+            tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
+            while type(tmp) == int: # case of no convergence
+            tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
+            cllj_surr[:, kk] = tmp[0]
+
         if workdir is not None:
             ds_surr = xr.Dataset(data_vars={'ENSO_surr': (('month', 'member'), enso_surr),
                                             'PDO_surr': (('month', 'member'), pdo_surr),
-                                            'AMO_surr': (('month', 'member'), amo_surr)},
+                                            'AMO_surr': (('month', 'member'), amo_surr),
+                                            'CLLJ_surr': (('month', 'member'), cllj_surr)}
                                  coords={'month': months, 'member': np.arange(n_ens_members)})
             ds_surr.to_netcdf(savename)
 
-    return enso_surr, pdo_surr, amo_surr, months
+    return enso_surr, pdo_surr, amo_surr, cllj_surr, months
 
 
 def save_forced_component(df, this_var, output_dir, workdir):
