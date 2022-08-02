@@ -557,7 +557,7 @@ def plot_sst_patterns(lat, lon, beta, ice_loc, modename, savename=None):
         plt.close()
 
 
-def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file, AMO_cutoff_freq, name_conversion):
+def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds, mode_lag, cvdp_file, AMO_cutoff_freq, name_conversion):
     """Return observational or model data and associated time series of modes for a given variable.
 
     Parameters
@@ -570,6 +570,10 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
         Full path to data file
     valid_years : numpy.ndarray
         Set of years to pull from file
+    latbounds : numpy.ndarry
+    	Set of lats to pull from file
+    lonbounds : numpy.ndarry
+    	Set of lons to pull from file
     mode_lag : int
         Number of months to lag the climate variable response from the mode time series
     cvdp_file : str
@@ -713,6 +717,13 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
     X_year = X_year[subset]
     X_month = X_month[subset]
 
+    #Subset lats & lons
+    subLat = np.isin(lat, latbounds)
+    subLon = np.isin(lon, lonbounds)
+    X = X[:, subLat, subLon]
+    X_lat = lat[subLat]
+    X_lon = lon[subLon]
+
     # Also need to check if our data spans the full valid period
     subset = np.isin(df_shifted['year'].values, X_year)
     df_shifted = df_shifted.loc[subset, :]
@@ -726,8 +737,8 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
     daX = xr.DataArray(data=X,
                        dims=('time', 'lat', 'lon'),
                        coords={'time': time,
-                               'lat': lat,
-                               'lon': lon},
+                               'lat': X_lat,
+                               'lon': X_lon},
                        attrs={'units': X_units})
 
     return daX, df_shifted, df
