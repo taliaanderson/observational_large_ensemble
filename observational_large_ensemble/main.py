@@ -61,8 +61,8 @@ if __name__ == '__main__':
         tas_dir = params.tas_dir
         pr_dir = params.pr_dir
         slp_dir = params.slp_dir
-        cvdp_file = '%s/HadISST.cvdp_data.1920-2018.nc' % cvdp_loc
-        file_dict = {'tas': '%s/Complete_TAVG_LatLong1.nc' % tas_dir,
+        cvdp_file = '%s/TAnderson_CVDP_combo.nc' % cvdp_loc
+        file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/full_data_monthly_v2020_025deg.nc' % pr_dir,
                      'slp': '%s/prmsl.mon.mean.nc' % slp_dir}
 

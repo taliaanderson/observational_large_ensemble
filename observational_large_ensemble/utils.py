@@ -648,18 +648,21 @@ def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds
 
     # Load data
     try:
-        lat = ds['latitude'].values
-        lon = ds['longitude'].values
-    except KeyError:
-        lat = ds['lat'].values
-        lon = ds['lon'].values
-    try:
         X = ds[this_varname]
         X_units = ds[this_varname].units
     except KeyError:
         alt_name = name_conversion[this_varname]
         X = ds[alt_name]
         X_units = ds[alt_name].units
+
+    X = X.sel(lat=slice(latbounds[0], latbounds[1]), lon=slice(lonbounds[0], lonbounds[1]))
+
+    try:
+        lat = X['latitude'].values
+        lon = X['longitude'].values
+    except KeyError:
+        lat = X['lat'].values
+        lon = X['lon'].values
 
     # Pull out values, since we'll be permuting the data / changing units, etc
     # For CESM1-LE precipitation, need to add up convective and large scale
@@ -718,11 +721,11 @@ def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds
     X_month = X_month[subset]
 
     #Subset lats & lons
-    subLat = np.where((lat >= latbounds[0]) & (lat <= latbounds[1]))
-	subLon = np.where((lon >= lonbounds[0]) & (lon <= lonbounds[1]))
-    X = X[:, subLat, subLon]
-    X_lat = lat[subLat]
-    X_lon = lon[subLon]
+    #subLat = np.where((lat >= latbounds[0]) & (lat <= latbounds[1]))
+	#subLon = np.where((lon >= lonbounds[0]) & (lon <= lonbounds[1]))
+    #X = X[:, subLat, subLon]
+    #X_lat = lat[subLat]
+    #X_lon = lon[subLon]
 
     # Also need to check if our data spans the full valid period
     subset = np.isin(df_shifted['year'].values, X_year)
@@ -737,8 +740,8 @@ def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds
     daX = xr.DataArray(data=X,
                        dims=('time', 'lat', 'lon'),
                        coords={'time': time,
-                               'lat': X_lat,
-                               'lon': X_lon},
+                               'lat': lat,
+                               'lon': lon},
                        attrs={'units': X_units})
 
     return daX, df_shifted, df
