@@ -557,7 +557,7 @@ def plot_sst_patterns(lat, lon, beta, ice_loc, modename, savename=None):
         plt.close()
 
 
-def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds, mode_lag, cvdp_file, AMO_cutoff_freq, name_conversion):
+def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file, AMO_cutoff_freq, name_conversion, latbounds, lonbounds):
     """Return observational or model data and associated time series of modes for a given variable.
 
     Parameters
@@ -570,10 +570,6 @@ def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds
         Full path to data file
     valid_years : numpy.ndarray
         Set of years to pull from file
-    latbounds : numpy.ndarry
-    	Upper and lower lat bounds to pull from file
-    lonbounds : numpy.ndarry
-    	Upper and lower lon bounds to pull from file
     mode_lag : int
         Number of months to lag the climate variable response from the mode time series
     cvdp_file : str
@@ -582,6 +578,10 @@ def get_obs(case, this_varname, this_filename, valid_years, latbounds, lonbounds
         Cut off frequency for Butterworth filter of AMO (1/years)
     name_conversion : dict
         Mapping from standard names to names in specific data sources
+    latbounds : numpy.ndarry
+    	Upper and lower lat bounds to pull from file
+    lonbounds : numpy.ndarry
+    	Upper and lower lon bounds to pull from file
 
     Returns
     -------

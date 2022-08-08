@@ -353,14 +353,14 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
             # CLLJ (accounting for seasonality of variance)
             tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
             while type(tmp) == int: # case of no convergence
-            tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
+                tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
             cllj_surr[:, kk] = tmp[0]
 
         if workdir is not None:
             ds_surr = xr.Dataset(data_vars={'ENSO_surr': (('month', 'member'), enso_surr),
                                             'PDO_surr': (('month', 'member'), pdo_surr),
                                             'AMO_surr': (('month', 'member'), amo_surr),
-                                            'CLLJ_surr': (('month', 'member'), cllj_surr)}
+                                            'CLLJ_surr': (('month', 'member'), cllj_surr)},
                                  coords={'month': months, 'member': np.arange(n_ens_members)})
             ds_surr.to_netcdf(savename)
 
