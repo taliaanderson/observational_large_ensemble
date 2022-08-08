@@ -245,7 +245,7 @@ def combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
                                df_shifted['AMO_lowpass'][:, np.newaxis, np.newaxis])
                 data += AMO_lowpass
 
-             if 'CLLJ' in predictors_names:
+            if 'CLLJ' in predictors_names:
 
                 CLLJ = (ds_beta.beta_CLLJ[modes_idx, ...].values *
                         df_shifted['CLLJ'][:, np.newaxis, np.newaxis])
