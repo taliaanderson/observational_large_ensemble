@@ -114,24 +114,47 @@ def forced_trend(varname, cvdp_loc):
         cvdp_loc = cvdp_loc + '/'
 
     # Can use CVDP output
-    fnames = sorted(glob('%sCESM1-CAM5-BGC-LE_*.cvdp_data.*.nc' % cvdp_loc))
+    fnames = sorted(glob('%sCESM1-LENS_*.cvdp_data.*.nc' % cvdp_loc))
+    fnames2 =  sorted(glob('%sCESM1-CAM5-BGC-LE_#*.cvdp_data.*.nc' % cvdp_loc))
 
     cvdp_name = 'tas_global_avg_mon'
 
     nfiles = len(fnames)
+
+    # 1920-2018 file
     ds = Dataset(fnames[0], 'r')
     time = ds['time'][:]
     time_units = ds['time'].units
     gm_em_units = ds[cvdp_name].units
 
+    # 2019-2100 file
+    ds2 = Dataset(fnames2[0], 'r')
+    time2 = ds2['time'][:]
+    time_units2 = ds2['time'].units
+    gm_em_units2 = ds2[cvdp_name].units
+
     n = len(time)
-    glob_mean = np.empty((nfiles, n))
+    n2= len(time2)
+
+    glob_mean = np.empty((nfiles, n)) #set up empty files
+    glob_mean2 = np.empty((nfiles, n2))
+
     for counter, file in enumerate(fnames):
-        ds = Dataset(file, 'r')
-        glob_mean[counter, :] = ds[cvdp_name][:]
+        for counter2, file2 in enumerate(fnames2):
+            ds = Dataset(file, 'r')
+            ds2 = Dataset(file2, 'r')
+            glob_mean[counter, :] = ds[cvdp_name][:]
+            glob_mean2[counter2, :] = ds2[cvdp_name][:]
+
+    # Concatenate the two files
+    glob_mean_concat = np.concatenate((glob_mean, glob_mean2), axis=1)
 
     # Take average across ensemble members
-    gm_em = np.mean(glob_mean, axis=0)
+    gm_em = np.mean(glob_mean_concat, axis=0)
+
+    # Fix time in 2019-2100 files
+    time2adjust = time2+len(time)
+    time = np.concatenate((time,time2adjust),axis=0)
 
     return gm_em, gm_em_units, time, time_units
 
@@ -1075,7 +1098,7 @@ def get_time_series(this_lat, this_lon, case, varnames):
         name_conversion = {'tas': 'TREFHT', 'pr': 'PRECC', 'slp': 'PSL'}
         cesm_names = [name_conversion[v] for v in varnames]
         this_member = int((case).split('-')[-1])
-        cvdp_file = '%s/CESM1-CAM5-BGC-LE_#%i.cvdp_data.1920-2018.nc' % (cvdp_loc, this_member)
+        cvdp_file = '%s/CESM1-LENS_%i.cvdp_data.1920-2018.nc' % (cvdp_loc, this_member)
 
         # Historical filenames for CESM. Will need to append part of RCP8.5 to get full period
         filenames = []
