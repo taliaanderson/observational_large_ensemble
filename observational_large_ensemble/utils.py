@@ -113,6 +113,9 @@ def forced_trend(varname, cvdp_loc):
     if not cvdp_loc.endswith('/'):
         cvdp_loc = cvdp_loc + '/'
 
+   # From params
+    valid_years = np.arange(1920, 2022)  # for obs
+
     # Can use CVDP output
     fnames = sorted(glob('%sCESM1-LENS_*.cvdp_data.*.nc' % cvdp_loc))
     fnames2 =  sorted(glob('%sCESM1-CAM5-BGC-LE_#*.cvdp_data.*.nc' % cvdp_loc))
@@ -126,25 +129,38 @@ def forced_trend(varname, cvdp_loc):
     time = ds['time'][:]
     time_units = ds['time'].units
     gm_em_units = ds[cvdp_name].units
+    dates = pd.date_range("1920-01-15",periods = len(time), freq="M")
+    yrs = dates.year
+    subset = np.isin(yrs, valid_years)
 
     # 2019-2100 file
     ds2 = Dataset(fnames2[0], 'r')
     time2 = ds2['time'][:]
     time_units2 = ds2['time'].units
     gm_em_units2 = ds2[cvdp_name].units
+    dates2 = pd.date_range("2019-01-15",periods = len(time2), freq="M")
+    yrs2 = dates2.year
+    subset2 = np.isin(yrs2, valid_years)
 
-    n = len(time)
-    n2= len(time2)
+    time2adjust = time2+len(time)
 
-    glob_mean = np.empty((nfiles, n)) #set up empty files
-    glob_mean2 = np.empty((nfiles, n2))
+    time = time[subset]
+    time2 = time2adjust[subset2]
+    timetot = np.concatenate((time,time2),axis=0)
+
+    glob_mean = np.empty((nfiles, len(time)))
+    glob_mean2 = np.empty((nfiles, len(time2)))
 
     for counter, file in enumerate(fnames):
         for counter2, file2 in enumerate(fnames2):
             ds = Dataset(file, 'r')
             ds2 = Dataset(file2, 'r')
-            glob_mean[counter, :] = ds[cvdp_name][:]
-            glob_mean2[counter2, :] = ds2[cvdp_name][:]
+            ds = ds[cvdp_name][:]
+            ds = ds[subset]
+            ds2 = ds2[cvdp_name][:]
+            ds2 = ds2[subset2]
+            glob_mean[counter, :] = ds
+            glob_mean2[counter2, :] = ds2
 
     # Concatenate the two files
     glob_mean_concat = np.concatenate((glob_mean, glob_mean2), axis=1)
@@ -153,8 +169,7 @@ def forced_trend(varname, cvdp_loc):
     gm_em = np.mean(glob_mean_concat, axis=0)
 
     # Fix time in 2019-2100 files
-    time2adjust = time2+len(time)
-    time = np.concatenate((time,time2adjust),axis=0)
+    time = timetot
 
     return gm_em, gm_em_units, time, time_units
 

@@ -3,7 +3,7 @@
 import numpy as np
 
 version_name = 'noF_CLLJ_CentAm_Pr'
-valid_years = np.arange(1921, 2019)  # for obs
+valid_years = np.arange(1920, 2022)  # for obs
 latbounds = [28, 6] # for obs (covers Caribbean and Central America)
 lonbounds = [-100, -60] # for obs
 cvdp_loc = '/glade/work/tanderson/CVDP/'

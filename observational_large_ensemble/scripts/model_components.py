@@ -41,7 +41,7 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
     df['CLLJ'] /= np.std(df['CLLJ'])
 
     attrs = da.attrs
-    attrs['description'] = 'Residuals after removing constant, trend, and regression patterns from ENSO, PDO, AMO.'
+    attrs['description'] = 'Residuals after removing constant, trend, and regression patterns from ENSO, PDO, AMO, CLLJ.'
 
     # Create dataset to save beta values
     ds_beta = xr.Dataset(coords={'month': np.arange(1, 13),
@@ -323,7 +323,7 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
         enso_surr = np.empty((ntime, n_ens_members))
         pdo_surr = np.empty_like(enso_surr)
         amo_surr = np.empty_like(pdo_surr)
-        cllj_surr = np.empty_like(amo_surr)
+        cllj_surr = np.empty_like(enso_surr)
 
         for kk in range(n_ens_members):
             # ENSO (accounting for seasonality of variance)
@@ -338,6 +338,12 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
                 tmp = olens_utils.iaaft(df['PDO_orth'].values)
             pdo_surr[:, kk] = tmp[0]
 
+            # CLLJ (accounting for seasonality of variance)
+            tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
+            while type(tmp) == int: # case of no convergence
+                tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
+            cllj_surr[:, kk] = tmp[0]
+
             # AMO
             tmp = olens_utils.iaaft(df['AMO_lowpass'].values)
             while type(tmp) == int:  # case of no convergence
@@ -349,12 +355,6 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
             else:  # no filter
                 amo_lowpass = tmp[0]
             amo_surr[:, kk] = amo_lowpass
-
-            # CLLJ (accounting for seasonality of variance)
-            tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
-            while type(tmp) == int: # case of no convergence
-                tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
-            cllj_surr[:, kk] = tmp[0]
 
         if workdir is not None:
             ds_surr = xr.Dataset(data_vars={'ENSO_surr': (('month', 'member'), enso_surr),
