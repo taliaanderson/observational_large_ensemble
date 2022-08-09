@@ -155,8 +155,7 @@ if __name__ == '__main__':
     # Create and save surrogate modes
     this_seed = 456
     ENSO_surr, PDO_orth_surr, AMO_surr, CLLJ_surr, mode_months = mc.create_surrogate_modes(cvdp_file, AMO_cutoff_freq,
-                                                                                this_seed, n_members, valid_years,
-                                                                                workdir)
+                                                                                this_seed, n_members, valid_years, workdir)
 
     # Put it all together, and save to netcdf files
     print('putting it all together')
