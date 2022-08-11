@@ -340,7 +340,7 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
 
             # CLLJ (accounting for seasonality of variance)
             tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
-            while type(tmp) == int: # case of no convergence
+            while type(tmp) == int:  # case of no convergence
                 tmp = olens_utils.iaaft(df['CLLJ'].values, fit_seasonal=True)
             cllj_surr[:, kk] = tmp[0]
 

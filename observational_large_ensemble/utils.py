@@ -217,9 +217,9 @@ def create_mode_df(fname, AMO_cutoff_freq):
     else:  # no filter
         amo_lowpass = amo_ts
 
-    df = pd.DataFrame(columns=['year', 'month', 'season', 'AMO', 'AMO_lowpass', 'PDO', 'ENSO', 'PDO_orth','CLLJ'])
+    df = pd.DataFrame(columns=['year', 'month', 'season', 'AMO', 'AMO_lowpass', 'PDO', 'ENSO', 'PDO_orth', 'CLLJ'])
     df = df.assign(year=year, month=month, season=season_names,
-                   AMO=amo_ts, AMO_lowpass=amo_lowpass, PDO=pdo_ts, ENSO=enso_ts, PDO_orth=pdo_orth, CLLJ = cllj_ts)
+                   AMO=amo_ts, AMO_lowpass=amo_lowpass, PDO=pdo_ts, ENSO=enso_ts, PDO_orth=pdo_orth, CLLJ=cllj_ts)
 
     return df
 
