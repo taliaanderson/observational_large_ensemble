@@ -49,6 +49,7 @@ if __name__ == '__main__':
     pr_transform = params.pr_transform
     varnames = params.varnames
     predictors_names = params.predictors_names
+    print(predictors_names)
     latbounds = params.latbounds
     lonbounds = params.lonbounds
 

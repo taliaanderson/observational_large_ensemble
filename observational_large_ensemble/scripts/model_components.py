@@ -40,6 +40,8 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
     df['AMO_lowpass'] /= np.std(df['AMO_lowpass'])
     df['CLLJ'] /= np.std(df['CLLJ'])
 
+    #print(df.head())
+
     attrs = da.attrs
     attrs['description'] = 'Residuals after removing constant, trend, and regression patterns from ENSO, PDO, AMO, CLLJ.'
 
@@ -312,9 +314,12 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
     else:
         # Load original versions
         df = olens_utils.create_mode_df(cvdp_file, AMO_cutoff_freq)
+        #print(cvdp_file)
+        #print(df.head())
         # Subset to valid years
         subset = np.isin(df['year'].values, valid_years)
         df = df.loc[subset, :]
+        #print(df.head())
         ntime = len(df)
         months = df['month'].values
 

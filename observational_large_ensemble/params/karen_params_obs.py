@@ -3,10 +3,10 @@
 import numpy as np
 
 version_name = 'noF_CLLJ_CentAm_Pr'
-valid_years = np.arange(1920, 2022)  # for obs
+valid_years = np.arange(1920, 2020)  # for obs
 latbounds = [28, 6] # for obs (covers Caribbean and Central America)
 lonbounds = [-100, -60] # for obs
-cvdp_loc = '/glade/work/tanderson/CVDP/'
+cvdp_loc = '/glade/work/tanderson/CVDP'
 AMO_cutoff_freq = 1/20  # Cut off frequency for Butterworth filter of AMO (1/years)
 mode_lag = 0  # number of months to lag between mode time series and climate response
 workdir_base = '/glade/work/tanderson/obsLE/parameters_v-%s' % version_name

@@ -114,7 +114,7 @@ def forced_trend(varname, cvdp_loc):
         cvdp_loc = cvdp_loc + '/'
 
    # From params
-    valid_years = np.arange(1920, 2022)  # for obs
+    valid_years = np.arange(1920, 2020)  # for obs
 
     # Can use CVDP output
     fnames = sorted(glob('%sCESM1-LENS_*.cvdp_data.*.nc' % cvdp_loc))
@@ -220,12 +220,13 @@ def create_mode_df(fname, AMO_cutoff_freq):
     df = pd.DataFrame(columns=['year', 'month', 'season', 'AMO', 'AMO_lowpass', 'PDO', 'ENSO', 'PDO_orth', 'CLLJ'])
     df = df.assign(year=year, month=month, season=season_names,
                    AMO=amo_ts, AMO_lowpass=amo_lowpass, PDO=pdo_ts, ENSO=enso_ts, PDO_orth=pdo_orth, CLLJ=cllj_ts)
+    #print(df.head())
 
     return df
 
 
 def pmtm(x, dt, nw=3, cl=0.95):
-    """Returns Thomson’s multitaper power spectral density (PSD) estimate, pxx, of the input signal, x.
+    """Returns Thomson's multitaper power spectral density (PSD) estimate, pxx, of the input signal, x.
 
     Slightly modified from Peter Huybers's matlab code, pmtmPH.m
 
@@ -525,6 +526,8 @@ def shift_df(df, shift, shift_names):
     df_shifted.reset_index(inplace=True)
     df_shifted = df_shifted.drop(['index'], axis=1)
 
+    #print(df_shifted.head())
+
     return df_shifted
 
 
@@ -646,11 +649,16 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
     # Get dataframe of modes
     df = create_mode_df(cvdp_file, AMO_cutoff_freq)
 
+    # Subset CVDP file
+    subset_cvdp = np.isin(df.year, valid_years)
+    df = df.loc[subset_cvdp, :]
+
     # Add EM, GM time series to it
     df = df.assign(F=gm_em)
 
     # Shift modes in time
     df_shifted = shift_df(df, mode_lag, ['year', 'month', 'season', 'F'])
+    #print(df_shifted.head())
 
     # Subset to valid years
     subset = np.isin(df_shifted['year'].values, valid_years)
@@ -781,6 +789,9 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
                                'lat': lat,
                                'lon': lon},
                        attrs={'units': X_units})
+
+    #print(df.head())
+    #print(df_shifted.head())
 
     return daX, df_shifted, df
 
@@ -1140,10 +1151,11 @@ def get_time_series(this_lat, this_lon, case, varnames):
         tas_dir = karen_params_obs.tas_dir
         pr_dir = karen_params_obs.pr_dir
         slp_dir = karen_params_obs.slp_dir
-        cvdp_file = '%s/HadISST.cvdp_data.1920-2018.nc' % cvdp_loc
-        file_dict = {'tas': '%s/Complete_TAVG_LatLong1.nc' % tas_dir,
-                     'pr': '%s/full_data_monthly_v2020.nc' % pr_dir,
+        cvdp_file = '%s/TAnderson_CVDP_combo.nc' % cvdp_loc
+        file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
+                     'pr': '%s/full_data_monthly_v2020_025deg.nc' % pr_dir,
                      'slp': '%s/prmsl.mon.mean.nc' % slp_dir}
+
 
         filenames = []
         for var in varnames:
