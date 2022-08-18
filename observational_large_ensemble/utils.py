@@ -14,6 +14,7 @@ import cartopy.crs as ccrs
 from datetime import timedelta
 from scipy.stats import boxcox
 import calendar
+import nctoolkit as nc
 
 
 def lowpass_butter(fs, L, order,  data, axis=-1, btype='low'):
@@ -672,7 +673,11 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
 
     # Load dataset
     if case == 'obs':  # Observational data
-        ds = xr.open_dataset(this_filename)
+        if this_varname == 'tas':
+            ds = nc.open_data(this_filename)
+            ds = ds.to_xarray()
+        else:
+            ds = xr.open_dataset(this_filename)
     elif 'LE' in case:  # CESM data. Allows for multiple runs to be concatenated if desired.
         if this_varname == 'pr':  # CESM splits up precipitation into convective and large scale, liquid+ice vs snow
             ds = xr.open_mfdataset(this_filename, combine='nested', concat_dim='time')
@@ -701,7 +706,11 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
         X = ds[alt_name]
         X_units = ds[alt_name].units
 
-    X = X.sel(lat=slice(latbounds[0], latbounds[1]), lon=slice(lonbounds[0], lonbounds[1]))
+    try:
+        X = X.sel(lat=slice(latbounds[0], latbounds[1]), lon=slice(lonbounds[0], lonbounds[1]))
+
+    except KeyError:
+        X = X.sel(latitude=slice(latbounds[0], latbounds[1]), longitude=slice(lonbounds[0], lonbounds[1]))
 
     try:
         lat = X['latitude'].values

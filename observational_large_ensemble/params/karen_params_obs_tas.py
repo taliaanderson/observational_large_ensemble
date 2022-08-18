@@ -4,7 +4,7 @@ import numpy as np
 
 version_name = 'CLLJ_CentAm_T'
 valid_years = np.arange(1920, 2020)  # for obs
-latbounds = [28, 6] # for obs (covers Caribbean and Central America)
+latbounds = [6, 28] # for obs (covers Caribbean and Central America)
 lonbounds = [-100, -60] # for obs
 cvdp_loc = '/glade/work/tanderson/CVDP'
 AMO_cutoff_freq = 1/20  # Cut off frequency for Butterworth filter of AMO (1/years)
