@@ -678,6 +678,7 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
             ds = ds.to_xarray()
         else:
             ds = xr.open_dataset(this_filename)
+
     elif 'LE' in case:  # CESM data. Allows for multiple runs to be concatenated if desired.
         if this_varname == 'pr':  # CESM splits up precipitation into convective and large scale, liquid+ice vs snow
             ds = xr.open_mfdataset(this_filename, combine='nested', concat_dim='time')
@@ -701,6 +702,7 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
     try:
         X = ds[this_varname]
         X_units = ds[this_varname].units
+        print(X_units)
     except KeyError:
         alt_name = name_conversion[this_varname]
         X = ds[alt_name]
@@ -708,7 +710,6 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
 
     try:
         X = X.sel(lat=slice(latbounds[0], latbounds[1]), lon=slice(lonbounds[0], lonbounds[1]))
-
     except KeyError:
         X = X.sel(latitude=slice(latbounds[0], latbounds[1]), longitude=slice(lonbounds[0], lonbounds[1]))
 

@@ -2,7 +2,7 @@
 
 import numpy as np
 
-version_name = 'noF_CLLJ_CentAm_Pr'
+version_name = 'noF_CLLJ_CentAm_Pr_05deg_siSeas_Anoms_small'
 valid_years = np.arange(1920, 2020)  # for obs
 latbounds = [28, 6] # for obs (covers Caribbean and Central America)
 lonbounds = [-100, -60] # for obs

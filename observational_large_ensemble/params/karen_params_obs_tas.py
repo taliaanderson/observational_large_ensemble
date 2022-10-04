@@ -2,7 +2,7 @@
 
 import numpy as np
 
-version_name = 'CLLJ_CentAm_T'
+version_name = 'noF_CLLJ_CentAm_Pr'
 valid_years = np.arange(1920, 2020)  # for obs
 latbounds = [6, 28] # for obs (covers Caribbean and Central America)
 lonbounds = [-100, -60] # for obs
