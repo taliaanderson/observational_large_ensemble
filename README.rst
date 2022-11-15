@@ -29,3 +29,7 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+
+UPDATE Nov. 14, 2022:
+This version of the Observational Large Ensemble was updated to include the Caribbean Low Level Jet (CLLJ) as a climate predictor. This approach was taken specifically for research questions related to Central America, where the CLLJ is an important mechanism that influences climate variability. This repository maintains the same structure as the original Observational Large Ensemble, but includes an additional section where code to produce figures has been added. 
