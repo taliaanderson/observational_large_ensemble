@@ -383,7 +383,7 @@ def save_forced_component(df, this_var, output_dir, workdir):
     df : pd.Dataframe
         Dataframe containing time series of GM-EM forcing
     this_var : str
-        Standard varname (tas, pr, slp)
+        Standard varname (tas, pr, slp, pdsi)
     output_dir : str
         Location to save forced trend
     workdir : str

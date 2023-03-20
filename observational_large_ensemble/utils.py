@@ -94,7 +94,7 @@ def forced_trend(varname, cvdp_loc):
     Parameters
     ----------
     varname : str
-        Variable to calculate the EM, GM trend for (tas, pr, slp)
+        Variable to calculate the EM, GM trend for (tas, pr, slp, pdsi)
     cvdp_loc : str
         Full path and filename for where the CVDP output has been untarred.
 
@@ -607,7 +607,7 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
     case : str
         Data type. Currently "obs" or "LE-XXX"
     this_varname : str
-        Standard variable name (tas, pr, or slp)
+        Standard variable name (tas, pr, slp, or pdsi)
     this_filename : str
         Full path to data file
     valid_years : numpy.ndarray
@@ -755,6 +755,8 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
         assert X_units == 'Pa'
     if this_varname == 'pr':
         assert X_units == 'mm/day'
+    if this_varname == 'pdsi':
+        assert X_units == 'scpdsi'
 
     if 'climatology' in ds.variables:
         climo = ds['climatology'].values
@@ -814,7 +816,7 @@ def choose_block(parameter_dir, varnames, percentile_threshold=97):
     parameter_dir : str
         Parent directory for parameter files
     varnames : list
-        List of (standard) variable names to be considered, i.e. ['tas', 'pr', 'slp']
+        List of (standard) variable names to be considered, i.e. ['tas', 'pr', 'slp', 'pdsi']
     percentile_threshold : float
         The percentile of estimated blocks to use universally.
 
@@ -1161,17 +1163,19 @@ def get_time_series(this_lat, this_lon, case, varnames):
         tas_dir = karen_params_obs.tas_dir
         pr_dir = karen_params_obs.pr_dir
         slp_dir = karen_params_obs.slp_dir
+        pdsi_dir = karen_params_obs.pdsi_dir
         cvdp_file = '%s/TAnderson_CVDP_combo.nc' % cvdp_loc
         file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/full_data_monthly_v2020_025deg.nc' % pr_dir,
-                     'slp': '%s/prmsl.mon.mean.nc' % slp_dir}
+                     'slp': '%s/prmsl.mon.mean.nc' % slp_dir,
+                     'pdsi': '%s/scPDSI.cru_ts4.06early1.1901.2021.cal_1950_21.bams.2022.GLOBAL.IGBP.WHC.1901.2021.nc' % pdsi_dir}
 
 
         filenames = []
         for var in varnames:
             filenames.append(file_dict[var])
 
-        name_conversion = {'tas': 'temperature', 'pr': 'precip', 'slp': 'prmsl'}
+        name_conversion = {'tas': 'temperature', 'pr': 'precip', 'slp': 'prmsl', 'pdsi': 'scpdsi'}
 
         daX, df_shifted, _ = get_obs(case, varnames[0], filenames[0],
                                      karen_params_obs.valid_years, mode_lag,

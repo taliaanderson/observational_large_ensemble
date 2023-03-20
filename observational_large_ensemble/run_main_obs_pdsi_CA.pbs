@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#PBS -l walltime=24:00:00
+#PBS -o logs/obs.log
+#PBS -e logs/obs.err
+#PBS -q casper
+#PBS -A P93300313
+#PBS -l select=1:ncpus=1:mem=3GB
+
+module load conda/latest
+conda activate my-envTas
+
+export TMPDIR=/glade/scratch/tanderson/temp
+mkdir -p $TMPDIR
+
+python -u -W ignore main.py 1000 obs
+

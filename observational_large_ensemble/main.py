@@ -55,7 +55,8 @@ if __name__ == '__main__':
 
     long_varnames = {'tas': 'near surface air temperature',
                      'pr': 'precipitation',
-                     'slp': 'sea level pressure'}
+                     'slp': 'sea level pressure',
+                     'pdsi': 'self calibrating palmer drought severity index'}
 
     workdir_base = '%s/%s' % (workdir_base, args.case)
     output_dir = '%s/%s' % (output_dir, args.case)
@@ -64,17 +65,19 @@ if __name__ == '__main__':
         tas_dir = params.tas_dir
         pr_dir = params.pr_dir
         slp_dir = params.slp_dir
+        pdsi_dir = params.pdsi_dir
         cvdp_file = '%s/TAnderson_CVDP_combo.nc' % cvdp_loc
         file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/gpcc_05_v2020.nc' % pr_dir,
-                     'slp': '%s/prmsl.mon.mean.nc' % slp_dir}
+                     'slp': '%s/prmsl.mon.mean.nc' % slp_dir,
+                     'pdsi': '%s/scPDSI.cru_ts4.06early1.1901.2021.cal_1950_21.bams.2022.GLOBAL.IGBP.WHC.1901.2021.nc' % pdsi_dir}
 
         filenames = []
         for var in varnames:
             filenames.append(file_dict[var])
 
-        data_names = {'tas': 'BEST', 'pr': 'GPCC', 'slp': '20CRv2c'}
-        name_conversion = {'tas': 'temperature', 'pr': 'precip', 'slp': 'prmsl'}
+        data_names = {'tas': 'BEST', 'pr': 'GPCC', 'slp': '20CRv2c', 'pdsi': 'CRU'}
+        name_conversion = {'tas': 'temperature', 'pr': 'precip', 'slp': 'prmsl', 'pdsi': 'scpdsi'}
         surr_prefix = 'HadISST_surrogate_mode_time_series_020'
 
         # Save parameter files
