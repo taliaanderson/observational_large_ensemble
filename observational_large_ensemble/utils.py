@@ -207,7 +207,9 @@ def create_mode_df(fname, AMO_cutoff_freq):
 
     enso_ts = ds['nino34'][:]
 
-    cllj_ts = ds['cllj_timeseries_mon'][:]
+    #cllj_ts = ds['cllj_timeseries_mon'][:]
+    cllj_ts = ds['clljV2_timeseries_mon'][:] #changed the TS
+
 
     # Create version of PDO that is orthogonal to ENSO using Gram-Schmidt method
     pdo_orth = pdo_ts - np.dot(pdo_ts, enso_ts)/np.dot(enso_ts, enso_ts)*enso_ts
@@ -1164,7 +1166,7 @@ def get_time_series(this_lat, this_lon, case, varnames):
         pr_dir = karen_params_obs.pr_dir
         slp_dir = karen_params_obs.slp_dir
         pdsi_dir = karen_params_obs.pdsi_dir
-        cvdp_file = '%s/TAnderson_CVDP_combo.nc' % cvdp_loc
+        cvdp_file = '%s/TAnderson_CVDP_combo_update_03_2023.nc' % cvdp_loc #changed to be updated CVDP for CLLJ
         file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/full_data_monthly_v2020_025deg.nc' % pr_dir,
                      'slp': '%s/prmsl.mon.mean.nc' % slp_dir,
