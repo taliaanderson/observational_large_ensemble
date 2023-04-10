@@ -115,7 +115,9 @@ def forced_trend(varname, cvdp_loc):
         cvdp_loc = cvdp_loc + '/'
 
    # From params
-    valid_years = np.arange(1920, 2020)  # for obs
+    from params import karen_params_obs as params
+    valid_years = params.valid_years
+    #valid_years = np.arange(1920, 2020)  # for obs
 
     # Can use CVDP output
     fnames = sorted(glob('%sCESM1-LENS_*.cvdp_data.*.nc' % cvdp_loc))
@@ -637,7 +639,9 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
         Unshifted version of df_shifted
 
     """
-
+    # Import valid years again
+    from params import karen_params_obs as params
+    valid_years = params.valid_years
     # The forced component of both temperature and precipitation are estimated through regressing the local
     # values onto the GM-EM temperature time series, which can be viewed as a proxy for radiative forcing.
 
@@ -655,7 +659,7 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
     # Subset CVDP file
     subset_cvdp = np.isin(df.year, valid_years)
     df = df.loc[subset_cvdp, :]
-
+    print(df.year)
     # Add EM, GM time series to it
     df = df.assign(F=gm_em)
 
@@ -1170,7 +1174,8 @@ def get_time_series(this_lat, this_lon, case, varnames):
         file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/full_data_monthly_v2020_025deg.nc' % pr_dir,
                      'slp': '%s/prmsl.mon.mean.nc' % slp_dir,
-                     'pdsi': '%s/scPDSI.cru_ts4.06early1.1901.2021.cal_1950_21.bams.2022.GLOBAL.IGBP.WHC.1901.2021.nc' % pdsi_dir}
+                     'pdsi': '%s/scPDSI.cru_ts4.1940.2019.detrended.nc' % pdsi_dir} #for detrended pdsi
+                     #'pdsi': '%s/scPDSI.cru_ts4.06early1.1901.2021.cal_1950_21.bams.2022.GLOBAL.IGBP.WHC.1901.2021.nc' % pdsi_dir} # for non detrended pdsi
 
 
         filenames = []

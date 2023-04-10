@@ -2,8 +2,8 @@
 
 import numpy as np
 
-version_name = 'noF_CLLJV2_v01_CentAm_Pr_05deg_siSeas_Anoms_small'
-valid_years = np.arange(1920, 2020)  # for obs
+version_name = 'CRU_pdsi_detrend_woF_CentAm_01'
+valid_years = np.arange(1940, 2020)  # for obs
 latbounds = [28, 6] # for obs (covers Caribbean and Central America)
 lonbounds = [-100, -60] # for obs
 cvdp_loc = '/glade/work/tanderson/CVDP'
@@ -14,7 +14,7 @@ output_dir = '/glade/scratch/tanderson/obsLE/output_v-%s' % version_name
 tas_dir = '/glade/work/tanderson/BEST'
 pr_dir = '/glade/work/tanderson/GPCC'
 slp_dir = '/glade/work/mckinnon/20CRv2c'
-pdsi_dir = '/glade/work/tanderson/CRU_PDSI'
+pdsi_dir = '/glade/work/tanderson/CRU_PDSI_Detrend'
 pr_transform = 'boxcox'  # can be boxcox or log
-varnames = ['pr']
+varnames = ['pdsi']
 predictors_names = ['constant', 'ENSO', 'PDO_orth', 'AMO_lowpass', 'CLLJ']
