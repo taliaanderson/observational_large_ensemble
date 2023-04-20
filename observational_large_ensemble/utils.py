@@ -83,13 +83,16 @@ def smooth(data, M):
 
 
 def forced_trend(varname, cvdp_loc):
-    """Calculate the global mean, ensemble mean trend across the CESM Large Ensemble.
+    """Original: Calculate the global mean, ensemble mean trend across the CESM Large Ensemble.
 
     This serves to provide the temporal shape for the estimated forced component.
     The methodology follows Dai et al (2015).
 
     This script draws upon the output from the CVDP as applied to the CESM1 LE. A tar file containing the
     CVDP output is available on cheyenne: /gpfs/fs1/collections/cdg/data/cesmLE/CESM-CAM5-BGC-LE/CVDP/
+
+    ###Update Central America: Extract CMIP6 multi-model mean global mean temperature trend (relative to annual climatology from the knmi explorer (SSP245).
+    https://climexp.knmi.nl/getindices.cgi?WMO=CMIP6/Tglobal/global_tas_mon_mod_ssp245_192_ave&STATION=CMIP6_ssp245_Tglobal&TYPE=i&id=someone@somewhere
 
     Parameters
     ----------
@@ -117,62 +120,89 @@ def forced_trend(varname, cvdp_loc):
    # From params
     from params import karen_params_obs as params
     valid_years = params.valid_years
-    #valid_years = np.arange(1920, 2020)  # for obs
 
-    # Can use CVDP output
-    fnames = sorted(glob('%sCESM1-LENS_*.cvdp_data.*.nc' % cvdp_loc))
-    fnames2 =  sorted(glob('%sCESM1-CAM5-BGC-LE_#*.cvdp_data.*.nc' % cvdp_loc))
+     # Load file
+    fname = glob('%sTAnderson_CVDP_combo_CMIP6gmt.nc' %cvdp_loc)
 
-    cvdp_name = 'tas_global_avg_mon'
+    # Variable of interest
+    cvdp_name = 'cmipT_timeseries_mon'
 
-    nfiles = len(fnames)
+    # Open Dataset
+    ds = xr.open_mfdataset(fname,decode_times=False)
 
-    # 1920-2018 file
-    ds = Dataset(fnames[0], 'r')
-    time = ds['time'][:]
+    # Get original time units to match original OLE set-up
     time_units = ds['time'].units
+    time_raw= ds['time']
+
+    # Create actual times to subset xarray
+    units, reference_date = ds['time'].units.split('since')
+    ds['time'] = pd.date_range(start=reference_date, periods=ds.sizes['time'], freq='MS')
+
+    # Subset time
+    subset = np.isin(ds['time.year'], valid_years)
+    time = time_raw[subset].values
+
+    # Subset data
+    ds = ds.sel(time=slice(str(valid_years[0]),str(valid_years[-1])))
+
+    # Extract gm_em
+    gm_em = ds.cmipT_timeseries_mon.values
     gm_em_units = ds[cvdp_name].units
-    dates = pd.date_range("1920-01-15",periods = len(time), freq="M")
-    yrs = dates.year
-    subset = np.isin(yrs, valid_years)
 
-    # 2019-2100 file
-    ds2 = Dataset(fnames2[0], 'r')
-    time2 = ds2['time'][:]
-    time_units2 = ds2['time'].units
-    gm_em_units2 = ds2[cvdp_name].units
-    dates2 = pd.date_range("2019-01-15",periods = len(time2), freq="M")
-    yrs2 = dates2.year
-    subset2 = np.isin(yrs2, valid_years)
+    ## Can use CVDP output
+    #fnames = sorted(glob('%sCESM1-LENS_*.cvdp_data.*.nc' % cvdp_loc))
+    #fnames2 =  sorted(glob('%sCESM1-CAM5-BGC-LE_#*.cvdp_data.*.nc' % cvdp_loc))
 
-    time2adjust = time2+len(time)
+    #cvdp_name = 'tas_global_avg_mon'
 
-    time = time[subset]
-    time2 = time2adjust[subset2]
-    timetot = np.concatenate((time,time2),axis=0)
+    #nfiles = len(fnames)
 
-    glob_mean = np.empty((nfiles, len(time)))
-    glob_mean2 = np.empty((nfiles, len(time2)))
+    ### 1920-2018 file
+    #ds = Dataset(fnames[0], 'r')
+    #time = ds['time'][:]
+    #time_units = ds['time'].units
+    #gm_em_units = ds[cvdp_name].units
+    #dates = pd.date_range("1920-01-15",periods = len(time), freq="M")
+    #yrs = dates.year
+    #subset = np.isin(yrs, valid_years)
 
-    for counter, file in enumerate(fnames):
-        for counter2, file2 in enumerate(fnames2):
-            ds = Dataset(file, 'r')
-            ds2 = Dataset(file2, 'r')
-            ds = ds[cvdp_name][:]
-            ds = ds[subset]
-            ds2 = ds2[cvdp_name][:]
-            ds2 = ds2[subset2]
-            glob_mean[counter, :] = ds
-            glob_mean2[counter2, :] = ds2
+    ### 2019-2100 file
+    #ds2 = Dataset(fnames2[0], 'r')
+    #time2 = ds2['time'][:]
+    #time_units2 = ds2['time'].units
+    #gm_em_units2 = ds2[cvdp_name].units
+    #dates2 = pd.date_range("2019-01-15",periods = len(time2), freq="M")
+    #yrs2 = dates2.year
+    #subset2 = np.isin(yrs2, valid_years)
 
-    # Concatenate the two files
-    glob_mean_concat = np.concatenate((glob_mean, glob_mean2), axis=1)
+    #time2adjust = time2+len(time)
 
-    # Take average across ensemble members
-    gm_em = np.mean(glob_mean_concat, axis=0)
+    #time = time[subset]
+    #time2 = time2adjust[subset2]
+    #timetot = np.concatenate((time,time2),axis=0)
 
-    # Fix time in 2019-2100 files
-    time = timetot
+    #glob_mean = np.empty((nfiles, len(time)))
+    #glob_mean2 = np.empty((nfiles, len(time2)))
+
+    #for counter, file in enumerate(fnames):
+    #    for counter2, file2 in enumerate(fnames2):
+    #        ds = Dataset(file, 'r')
+    #        ds2 = Dataset(file2, 'r')
+    #        ds = ds[cvdp_name][:]
+    #        ds = ds[subset]
+    #        ds2 = ds2[cvdp_name][:]
+    #        ds2 = ds2[subset2]
+    #        glob_mean[counter, :] = ds
+    #        glob_mean2[counter2, :] = ds2
+
+    ### Concatenate the two files
+    #glob_mean_concat = np.concatenate((glob_mean, glob_mean2), axis=1)
+
+    ### Take average across ensemble members
+    #gm_em = np.mean(glob_mean_concat, axis=0)
+
+    ### Fix time in 2019-2100 files
+    #time = timetot
 
     return gm_em, gm_em_units, time, time_units
 
@@ -659,7 +689,7 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
     # Subset CVDP file
     subset_cvdp = np.isin(df.year, valid_years)
     df = df.loc[subset_cvdp, :]
-    print(df.year)
+
     # Add EM, GM time series to it
     df = df.assign(F=gm_em)
 
@@ -1170,7 +1200,7 @@ def get_time_series(this_lat, this_lon, case, varnames):
         pr_dir = karen_params_obs.pr_dir
         slp_dir = karen_params_obs.slp_dir
         pdsi_dir = karen_params_obs.pdsi_dir
-        cvdp_file = '%s/TAnderson_CVDP_combo_update_03_2023.nc' % cvdp_loc #changed to be updated CVDP for CLLJ
+        cvdp_file = '%s/TAnderson_CVDP_combo_CMIP6gmt.nc' % cvdp_loc #changed to be updated CVDP for CLLJ
         file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/full_data_monthly_v2020_025deg.nc' % pr_dir,
                      'slp': '%s/prmsl.mon.mean.nc' % slp_dir,

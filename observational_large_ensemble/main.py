@@ -66,7 +66,7 @@ if __name__ == '__main__':
         pr_dir = params.pr_dir
         slp_dir = params.slp_dir
         pdsi_dir = params.pdsi_dir
-        cvdp_file = '%s/TAnderson_CVDP_combo_update_03_2023.nc' % cvdp_loc #update file name for cllj
+        cvdp_file = '%s/TAnderson_CVDP_combo_CMIP6gmt.nc' % cvdp_loc #update file name for cllj
         file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/gpcc_05_v2020.nc' % pr_dir,
                      'slp': '%s/prmsl.mon.mean.nc' % slp_dir,

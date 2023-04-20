@@ -375,8 +375,10 @@ def create_surrogate_modes(cvdp_file, AMO_cutoff_freq, this_seed, n_ens_members,
 def save_forced_component(df, this_var, output_dir, workdir):
     """Calculate and save to netcdf the estimated forced component.
 
-    The forced component is estimated by regressing the data onto the CESM1-LE global mean, ensemble mean
+    Original: The forced component is estimated by regressing the data onto the CESM1-LE global mean, ensemble mean
     of the same variable.
+
+    Central America: The forced component is estimated as the regional temperature time series.
 
     Parameters
     ----------
@@ -416,8 +418,10 @@ def save_forced_component(df, this_var, output_dir, workdir):
         cmd = 'mkdir -p %s/%s' % (output_dir, this_var)
         check_call(cmd.split())
     savename = '%s/%s/%s_forced.nc' % (output_dir, this_var, this_var)
-    F.attrs['description'] = ('Forced component estimated through regressing data onto '
-                              'CESM1-LE global mean, ensemble mean time series.')
+    #F.attrs['description'] = ('Forced component estimated through regressing data onto '
+                              #'CESM1-LE global mean, ensemble mean time series.')
+    F.attrs['description'] = ('Forced component estimated as regional temperature time '
+                              'series.')
     F.to_netcdf(savename)
 
     # For ease, also save the constant term
