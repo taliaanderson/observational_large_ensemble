@@ -1204,8 +1204,8 @@ def get_time_series(this_lat, this_lon, case, varnames):
         file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/full_data_monthly_v2020_025deg.nc' % pr_dir,
                      'slp': '%s/prmsl.mon.mean.nc' % slp_dir,
-                     'pdsi': '%s/scPDSI.cru_ts4.1940.2019.detrended.nc' % pdsi_dir} #for detrended pdsi
-                     #'pdsi': '%s/scPDSI.cru_ts4.06early1.1901.2021.cal_1950_21.bams.2022.GLOBAL.IGBP.WHC.1901.2021.nc' % pdsi_dir} # for non detrended pdsi
+                     #'pdsi': '%s/scPDSI.cru_ts4.1940.2019.detrended.nc' % pdsi_dir} #for detrended pdsi
+                     'pdsi': '%s/scPDSI.cru_ts4.06early1.1901.2021.cal_1950_21.bams.2022.GLOBAL.IGBP.WHC.1901.2021.nc' % pdsi_dir} # for non detrended pdsi
 
 
         filenames = []

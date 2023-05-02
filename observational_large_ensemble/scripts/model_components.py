@@ -378,8 +378,7 @@ def save_forced_component(df, this_var, output_dir, workdir):
     Original: The forced component is estimated by regressing the data onto the CESM1-LE global mean, ensemble mean
     of the same variable.
 
-    Central America: The forced component is estimated as the regional temperature time series.
-
+    Central America: The forced component is estimated as from CMIP6 mean from KNMI (SSP245)
     Parameters
     ----------
     df : pd.Dataframe
