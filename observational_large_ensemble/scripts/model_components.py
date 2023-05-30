@@ -42,6 +42,19 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
 
     #print(df.head())
 
+    # Subset df and da for shortened beta fitting test
+    da_years = da['time.year']
+
+    sub_years = da_years.values < 2015
+    print(sub_years)
+
+    df = df[sub_years, :]
+    print(len(df))
+
+    da = da.sel(time=slice('1920-01-01','2014-12-01')) # slice data to pre-drought
+    print(da)
+    ########
+
     attrs = da.attrs
     attrs['description'] = 'Residuals after removing constant, trend, and regression patterns from ENSO, PDO, AMO, CLLJ.'
 
