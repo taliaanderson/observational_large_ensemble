@@ -873,6 +873,8 @@ def choose_block(parameter_dir, varnames, percentile_threshold=97):
         fname = '%s/residual.nc' % this_dir
 
         da = xr.open_dataarray(fname)
+        #da = da.sel(time=slice('1920-01-01','2014-12-31')) # slice data to pre-drought (ONLY FOR SHORT BETA TEST)
+
         _, nlat, nlon = np.shape(da)
 
         has_data = ~np.isnan(da[-1, ...].values)

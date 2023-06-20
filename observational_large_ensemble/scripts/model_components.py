@@ -42,17 +42,25 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
 
     #print(df.head())
 
+    # Keep originals for later
+    #da_orig = da
+    #df_orig = df
+
     # Subset df and da for shortened beta fitting test
-    da_years = da['time.year']
+    #da_years = da['time.year']
 
-    sub_years = da_years.values < 2015
-    print(sub_years)
+    #sub_years = da_years.values < 2015
+    #print(sub_years)
 
-    df = df[sub_years, :]
-    print(len(df))
+    #df = df.loc[sub_years, :]
+    #print(len(df))
 
-    da = da.sel(time=slice('1920-01-01','2014-12-01')) # slice data to pre-drought
-    print(da)
+    #da = da.sel(time=slice('1920-01-01','2014-12-31')) # slice data to pre-drought
+    #print(da)
+
+    #attrs_orig = da_orig.attrs
+    #attrs_orig['description'] = 'Residuals after removing constant, trend, and regression patterns from ENSO, PDO, AMO, CLLJ.'
+
     ########
 
     attrs = da.attrs
@@ -97,7 +105,7 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
     rec = np.real(np.dot(bases.T, np.conj(coeff))).reshape((12, nlat, nlon, len(predictors_names)))
     rec += np.mean(BETA, axis=0)
 
-    # Recalculate yhat and residuals with these smoothed values
+    ## Recalculate yhat and residuals with these smoothed values
     residual = np.empty(da.shape)
     yhat = np.empty(da.shape)
     for month in range(1, 13):
@@ -126,6 +134,35 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
         kwargs = {'beta_%s' % name: (('month', 'lat', 'lon'), rec[..., counter])}
         ds_beta = ds_beta.assign(**kwargs)
 
+    # Recalculate yhat and residuals with these smoothed values on original data for the betas fitted to 2014
+    #residual = np.empty(da_orig.shape)
+    #yhat = np.empty(da_orig.shape)
+    #for month in range(1, 13):
+#
+    #    time_idx = da_orig['time.month'] == month
+#
+    #    predictand = da_orig.sel(time=da_orig['time.month'] == month).values
+    #    predictors = df_orig.loc[df_orig['month'] == month, predictors_names].values
+    #    ntime, nlat, nlon = np.shape(predictand)
+#
+    #    y_mat = np.matrix(predictand.reshape(ntime, nlat*nlon))
+    #    X_mat = np.matrix(predictors)
+#
+    #    beta = rec[month - 1, ...]
+    #    beta = beta.reshape((nlat*nlon, len(predictors_names)))
+    #    this_yhat = np.dot(X_mat, beta.T)
+    #    residual[time_idx, ...] = np.array(y_mat - this_yhat).reshape((ntime, nlat, nlon))
+    #    yhat[time_idx, ...] = np.array(this_yhat).reshape((ntime, nlat, nlon))
+#
+    #da_residual = da_orig.copy(data=residual)
+    #da_residual.attrs = attrs_orig
+#
+    #da_yhat = da_orig.copy(data=yhat)
+    #da_yhat.attrs['description'] = 'Fitted values (non-residual)'
+    #for counter, name in enumerate(predictors_names):
+    #    kwargs = {'beta_%s' % name: (('month', 'lat', 'lon'), rec[..., counter])}
+    #    ds_beta = ds_beta.assign(**kwargs)
+#
     # Save to netcdf
     var_dir = '%s/%s' % (workdir, this_varname)
 
@@ -234,6 +271,7 @@ def combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
             # Add in the relevant components
             data = mean + climate_noise.values
 
+            # Comment out F for test to remove forcing from PDSI model post-beta calculations
             if 'F' in predictors_names:
                 forced_file = '%s/%s/%s_forced.nc' % (output_dir, this_varname, this_varname)
                 daF = xr.open_dataarray(forced_file)
