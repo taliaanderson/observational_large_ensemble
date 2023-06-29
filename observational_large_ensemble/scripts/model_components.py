@@ -245,7 +245,7 @@ def combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
             # Add in the relevant components
             data = mean + climate_noise.values
 
-            # Comment out F for test to remove forcing from PDSI model post-beta calculations
+            ########## Comment out F for test to remove forcing from PDSI model post-beta calculations
             if 'F' in predictors_names:
                 forced_file = '%s/%s/%s_forced.nc' % (output_dir, this_varname, this_varname)
                 daF = xr.open_dataarray(forced_file)
