@@ -40,12 +40,9 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
     df['AMO_lowpass'] /= np.std(df['AMO_lowpass'])
     df['CLLJ'] /= np.std(df['CLLJ'])
 
-    #print(df.head())
+    print(df.head())
 
-    # Keep originals for later
-    #da_orig = da
-    #df_orig = df
-
+    ######## TEST CODE FOR SHORT BETAS
     # Subset df and da for shortened beta fitting test
     #da_years = da['time.year']
 
@@ -134,35 +131,6 @@ def fit_linear_model(da, df, this_varname, workdir, predictors_names):
         kwargs = {'beta_%s' % name: (('month', 'lat', 'lon'), rec[..., counter])}
         ds_beta = ds_beta.assign(**kwargs)
 
-    # Recalculate yhat and residuals with these smoothed values on original data for the betas fitted to 2014
-    #residual = np.empty(da_orig.shape)
-    #yhat = np.empty(da_orig.shape)
-    #for month in range(1, 13):
-#
-    #    time_idx = da_orig['time.month'] == month
-#
-    #    predictand = da_orig.sel(time=da_orig['time.month'] == month).values
-    #    predictors = df_orig.loc[df_orig['month'] == month, predictors_names].values
-    #    ntime, nlat, nlon = np.shape(predictand)
-#
-    #    y_mat = np.matrix(predictand.reshape(ntime, nlat*nlon))
-    #    X_mat = np.matrix(predictors)
-#
-    #    beta = rec[month - 1, ...]
-    #    beta = beta.reshape((nlat*nlon, len(predictors_names)))
-    #    this_yhat = np.dot(X_mat, beta.T)
-    #    residual[time_idx, ...] = np.array(y_mat - this_yhat).reshape((ntime, nlat, nlon))
-    #    yhat[time_idx, ...] = np.array(this_yhat).reshape((ntime, nlat, nlon))
-#
-    #da_residual = da_orig.copy(data=residual)
-    #da_residual.attrs = attrs_orig
-#
-    #da_yhat = da_orig.copy(data=yhat)
-    #da_yhat.attrs['description'] = 'Fitted values (non-residual)'
-    #for counter, name in enumerate(predictors_names):
-    #    kwargs = {'beta_%s' % name: (('month', 'lat', 'lon'), rec[..., counter])}
-    #    ds_beta = ds_beta.assign(**kwargs)
-#
     # Save to netcdf
     var_dir = '%s/%s' % (workdir, this_varname)
 
@@ -189,6 +157,7 @@ def combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
         da = xr.open_dataarray(fname_epsilon)
         da_yhat = xr.open_dataarray(fname_yhat)
         ntime, nlat, nlon = np.shape(da)
+        print(ntime)
 
         fname_beta = '%s/beta.nc' % this_dir
         ds_beta = xr.open_dataset(fname_beta)
@@ -222,6 +191,11 @@ def combine_variability(varnames, workdir, output_dir, n_members, block_use_mo,
                                     'ENSO': ENSO_ts/np.std(ENSO_ts),
                                     'PDO_orth': PDO_orth_ts/np.std(PDO_orth_ts),
                                     'CLLJ': CLLJ_ts/np.std(CLLJ_ts)})
+
+            ########## MAKE mode_df SAME LENGTH AS YHAT for shortened beta test
+            #mode_df = mode_df.iloc[0:ntime, :]
+            #print(mode_df)
+            ################
 
             # Use the indices for one month before the climate response
             df_shifted = olens_utils.shift_df(mode_df, mode_lag, ['month'])

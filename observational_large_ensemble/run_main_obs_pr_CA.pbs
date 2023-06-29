@@ -14,4 +14,3 @@ export TMPDIR=/glade/scratch/tanderson/temp
 mkdir -p $TMPDIR
 
 python -u -W ignore main.py 1000 obs
-

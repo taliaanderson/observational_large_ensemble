@@ -149,61 +149,6 @@ def forced_trend(varname, cvdp_loc):
     gm_em = ds.cmipT_timeseries_mon.values
     gm_em_units = ds[cvdp_name].units
 
-    ## Can use CVDP output
-    #fnames = sorted(glob('%sCESM1-LENS_*.cvdp_data.*.nc' % cvdp_loc))
-    #fnames2 =  sorted(glob('%sCESM1-CAM5-BGC-LE_#*.cvdp_data.*.nc' % cvdp_loc))
-
-    #cvdp_name = 'tas_global_avg_mon'
-
-    #nfiles = len(fnames)
-
-    ### 1920-2018 file
-    #ds = Dataset(fnames[0], 'r')
-    #time = ds['time'][:]
-    #time_units = ds['time'].units
-    #gm_em_units = ds[cvdp_name].units
-    #dates = pd.date_range("1920-01-15",periods = len(time), freq="M")
-    #yrs = dates.year
-    #subset = np.isin(yrs, valid_years)
-
-    ### 2019-2100 file
-    #ds2 = Dataset(fnames2[0], 'r')
-    #time2 = ds2['time'][:]
-    #time_units2 = ds2['time'].units
-    #gm_em_units2 = ds2[cvdp_name].units
-    #dates2 = pd.date_range("2019-01-15",periods = len(time2), freq="M")
-    #yrs2 = dates2.year
-    #subset2 = np.isin(yrs2, valid_years)
-
-    #time2adjust = time2+len(time)
-
-    #time = time[subset]
-    #time2 = time2adjust[subset2]
-    #timetot = np.concatenate((time,time2),axis=0)
-
-    #glob_mean = np.empty((nfiles, len(time)))
-    #glob_mean2 = np.empty((nfiles, len(time2)))
-
-    #for counter, file in enumerate(fnames):
-    #    for counter2, file2 in enumerate(fnames2):
-    #        ds = Dataset(file, 'r')
-    #        ds2 = Dataset(file2, 'r')
-    #        ds = ds[cvdp_name][:]
-    #        ds = ds[subset]
-    #        ds2 = ds2[cvdp_name][:]
-    #        ds2 = ds2[subset2]
-    #        glob_mean[counter, :] = ds
-    #        glob_mean2[counter2, :] = ds2
-
-    ### Concatenate the two files
-    #glob_mean_concat = np.concatenate((glob_mean, glob_mean2), axis=1)
-
-    ### Take average across ensemble members
-    #gm_em = np.mean(glob_mean_concat, axis=0)
-
-    ### Fix time in 2019-2100 files
-    #time = timetot
-
     return gm_em, gm_em_units, time, time_units
 
 
@@ -814,13 +759,6 @@ def get_obs(case, this_varname, this_filename, valid_years, mode_lag, cvdp_file,
     X_year = X_year[subset]
     X_month = X_month[subset]
 
-    #Subset lats & lons
-    #subLat = np.where((lat >= latbounds[0]) & (lat <= latbounds[1]))
-	#subLon = np.where((lon >= lonbounds[0]) & (lon <= lonbounds[1]))
-    #X = X[:, subLat, subLon]
-    #X_lat = lat[subLat]
-    #X_lon = lon[subLon]
-
     # Also need to check if our data spans the full valid period
     subset = np.isin(df_shifted['year'].values, X_year)
     df_shifted = df_shifted.loc[subset, :]
@@ -873,7 +811,6 @@ def choose_block(parameter_dir, varnames, percentile_threshold=97):
         fname = '%s/residual.nc' % this_dir
 
         da = xr.open_dataarray(fname)
-        #da = da.sel(time=slice('1920-01-01','2014-12-31')) # slice data to pre-drought (ONLY FOR SHORT BETA TEST)
 
         _, nlat, nlon = np.shape(da)
 
@@ -1210,7 +1147,6 @@ def get_time_series(this_lat, this_lon, case, varnames):
         file_dict = {'tas': '%s/BEST_TAVG_LatLong1.nc' % tas_dir,
                      'pr': '%s/full_data_monthly_v2020_025deg.nc' % pr_dir,
                      'slp': '%s/prmsl.mon.mean.nc' % slp_dir,
-                     #'pdsi': '%s/scPDSI.cru_ts4.1940.2019.detrended.nc' % pdsi_dir} #for detrended pdsi
                      'pdsi': '%s/scPDSI.cru_ts4.06early1.1901.2021.cal_1950_21.bams.2022.GLOBAL.IGBP.WHC.1901.2021.nc' % pdsi_dir} # for non detrended pdsi
 
 
